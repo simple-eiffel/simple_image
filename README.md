@@ -1,4 +1,10 @@
+<p align="center">
+  <img src="docs/images/logo.svg" alt="simple_image logo" width="400">
+</p>
+
 # simple_image
+
+**[Documentation](https://simple-eiffel.github.io/simple_image/)** | **[GitHub](https://github.com/simple-eiffel/simple_image)**
 
 Image editing in Eiffel: load, filter, mask, compose, save. Built to make video thumbnails and
 reel covers without Python.

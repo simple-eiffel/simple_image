@@ -1,4 +1,36 @@
+# Eiffel build artifacts
 EIFGENs/
-data/output/
+Documentation/
+
+# Compiled files
+*.melted
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Backup files
 *.swp
+*.bak
+*~
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+
+*.epr
+*.log
+
+# Test output and session scratch
+data/output/
 tmpclaude-*
+
+# Keep the design record: spike logs are evidence
+!.eiffel-workflow/**/*.log

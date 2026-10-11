@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>simple_image - Image Editing Library for Eiffel</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="images/logo.svg" alt="simple_* logo" class="logo">
+        </div>
+        <h1>simple_image</h1>
+        <p class="tagline">Image Editing for Eiffel: Load, Filter, Mask, Compose, Save</p>
+        <div class="badges">
+            <span class="badge badge-version">v0.1.0</span>
+            <span class="badge badge-license">MIT</span>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#quick-start">Quick Start</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#api">API Reference</a></li>
+            <li><a href="#design">Design Notes</a></li>
+            <li><a href="#testing">Testing</a></li>
+            <li><a href="https://github.com/simple-eiffel/simple_image">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>
+                <strong>simple_image</strong> is image editing in Eiffel: load, filter, mask, compose, save. It was built
+                to make video thumbnails and reel covers without Python. Pixels live in C memory, every operation is an
+                Eiffel feature with contracts over a C kernel, and drawing goes through
+                <a href="https://github.com/simple-eiffel/simple_cairo">simple_cairo</a>.
+            </p>
+            <p>
+                Files go through <a href="https://github.com/simple-eiffel/simple_stb">simple_stb</a>: PNG, JPEG, BMP, TGA,
+                GIF, PSD and HDR in; PNG and JPEG out. The AI helpers (person cutout) are in
+                <a href="https://github.com/simple-eiffel/simple_image_ai">simple_image_ai</a>.
+            </p>
+            <p>
+                Part of the <a href="https://github.com/simple-eiffel">Simple Eiffel</a> ecosystem.
+            </p>
+        </section>
+
+        <section id="quick-start">
+            <h2>Quick Start</h2>
+
+            <h3>Installation</h3>
+            <ol>
+                <li>Set the environment variable:
+<pre><code>export SIMPLE_EIFFEL=/d/prod</code></pre>
+                </li>
+                <li>Add to your ECF file:
+<pre><code>&lt;library name=&quot;simple_image&quot; location=&quot;$SIMPLE_EIFFEL/simple_image/simple_image.ecf&quot;/&gt;</code></pre>
+                </li>
+            </ol>
+
+            <h3>An Outlined Title with a Soft Shadow</h3>
+<pre><code><span class="keyword">local</span>
+    images: <span class="type">SIMPLE_IMAGE</span>
+<span class="keyword">do</span>
+    <span class="keyword">create</span> images.make
+    background := images.load (<span class="string">"frame.png"</span>)           <span class="comment">-- detachable: check it</span>
+    background.enhance_brightness (0.5)
+    background.vignette (0.6)
+
+    shadow_canvas := images.new_mask_canvas (background.width, background.height)
+    shadow_canvas.context.select_font (<span class="string">"Impact"</span>, shadow_canvas.context.Slant_normal, shadow_canvas.context.Weight_normal)
+        .set_font_size (130).move_to (60, 660).text_path (<span class="string">"TITLE"</span>).fill.do_nothing
+    shadow := shadow_canvas.to_mask
+    shadow.grow (3)
+    shadow.blur (6)
+
+    canvas := images.canvas_from (background)
+    canvas.fill_through (shadow, 0xC0000000, 6, 6)
+    canvas.context.select_font (<span class="string">"Impact"</span>, ...).set_font_size (130).move_to (60, 660).text_path (<span class="string">"TITLE"</span>).do_nothing
+    canvas.context.set_color_rgb (0, 0, 0).set_line_width (14).set_line_join (canvas.context.Join_round)
+        .stroke_preserve.set_color_rgb (1, 0.83, 0.3).fill.do_nothing
+    result := canvas.to_image
+    <span class="keyword">if</span> result.save_jpg (<span class="string">"thumbnail.jpg"</span>, 92) <span class="keyword">then</span> ... <span class="keyword">end</span>
+<span class="keyword">end</span></code></pre>
+            <p>
+                Colors are <code>NATURAL_32</code> words <code>0xAARRGGBB</code> with straight alpha. Paths must be plain
+                ASCII, because simple_stb opens files with <code>fopen</code>.
+            </p>
+        </section>
+
+        <section id="features">
+            <h2>Key Features</h2>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Straight RGBA Images</h4>
+                    <p>IMG_IMAGE holds non-premultiplied RGBA, 8 bits per channel, in C memory.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Image Editing</h4>
+                    <p>Blur, Lanczos-3 resize, crop, brightness, contrast, color, vignette, flatten, alpha.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Masks</h4>
+                    <p>IMG_MASK is one 8-bit channel: blur, grow, shrink, threshold, invert, flood fill, resize, crop.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Keep the Largest Piece</h4>
+                    <p>keep_largest_piece removes specks from a cutout and keeps the soft edge.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Canvas Drawing</h4>
+                    <p>IMG_CANVAS places layers, paints a color through a mask, and draws text and shapes on simple_cairo.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Mask Canvases</h4>
+                    <p>A mask canvas turns whatever is drawn on it into a mask, for text shadows and glows.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="api">
+            <h2>API Reference</h2>
+
+            <div class="api-section">
+                <h3>SIMPLE_IMAGE (Facade)</h3>
+                <p>Image editing in Eiffel: load, filter, mask, compose, save.</p>
+
+                <h4>Initialization</h4>
+                <div class="signature">make</div>
+                <p>Ready to load and create images.</p>
+                <h4>Loading</h4>
+                <div class="signature">load (a_path: READABLE_STRING_GENERAL): detachable IMG_IMAGE</div>
+                <p>The image in the file as RGBA, or Void (see last_error).</p>
+                <div class="signature">load_mask (a_path: READABLE_STRING_GENERAL): detachable IMG_MASK</div>
+                <p>The file read as one gray channel, or Void (see last_error).</p>
+                <h4>Creation</h4>
+                <div class="signature">new_image (a_width, a_height: INTEGER): IMG_IMAGE</div>
+                <p>A transparent image.</p>
+                <div class="signature">new_mask (a_width, a_height: INTEGER): IMG_MASK</div>
+                <p>An empty mask.</p>
+                <div class="signature">new_canvas (a_width, a_height: INTEGER): IMG_CANVAS</div>
+                <p>A transparent color canvas.</p>
+                <div class="signature">new_mask_canvas (a_width, a_height: INTEGER): IMG_CANVAS</div>
+                <p>An empty mask canvas: what is drawn on it becomes a mask.</p>
+                <div class="signature">canvas_from (a_image: IMG_IMAGE): IMG_CANVAS</div>
+                <p>A color canvas holding a copy of the image.</p>
+                <div class="signature">gray_of (a_image: IMG_IMAGE): IMG_MASK</div>
+                <p>A mask of the image&#x27;s gray levels (alpha ignored).</p>
+                <h4>Status</h4>
+                <div class="signature">last_error: STRING</div>
+                <p>Why the last load failed (empty when it did not).</p>
+                <div class="signature">has_error: BOOLEAN</div>
+                <p>Did the last load fail?</p>
+                <div class="signature">version: STRING</div>
+            </div>
+            <div class="api-section">
+                <h3>IMG_IMAGE</h3>
+                <p>An image: straight (non-premultiplied) RGBA, 8 bits per channel, in C memory.</p>
+
+                <h4>Initialization</h4>
+                <div class="signature">make (a_width, a_height: INTEGER)</div>
+                <p>Transparent black image.</p>
+                <div class="signature">make_filled (a_width, a_height: INTEGER; a_colour: NATURAL_32)</div>
+                <p>Image filled with a color (0xAARRGGBB).</p>
+                <h4>Access</h4>
+                <div class="signature">width: INTEGER</div>
+                <div class="signature">height: INTEGER</div>
+                <div class="signature">stride: INTEGER</div>
+                <div class="signature">pixel_count: INTEGER</div>
+                <div class="signature">pixels: POINTER</div>
+                <p>Address of the first pixel (R, G, B, A bytes). Valid until destroy.</p>
+                <div class="signature">pixel (a_x, a_y: INTEGER): NATURAL_32</div>
+                <p>Color at the position as 0xAARRGGBB, straight alpha.</p>
+                <div class="signature">alpha: IMG_MASK</div>
+                <p>A new mask holding this image&#x27;s alpha channel.</p>
+                <h4>Status</h4>
+                <div class="signature">is_usable: BOOLEAN</div>
+                <div class="signature">is_opaque: BOOLEAN</div>
+                <p>Is every pixel fully opaque (alpha 255)?</p>
+                <div class="signature">is_inside (a_x, a_y, a_width, a_height: INTEGER): BOOLEAN</div>
+                <p>Does the rectangle lie wholly inside the image?</p>
+                <h4>Pixels</h4>
+                <div class="signature">set_pixel (a_x, a_y: INTEGER; a_colour: NATURAL_32)</div>
+                <p>Set the color at the position.</p>
+                <div class="signature">fill (a_colour: NATURAL_32)</div>
+                <p>Set every pixel to the color.</p>
+                <div class="signature">set_alpha (a_mask: IMG_MASK)</div>
+                <p>Use the mask as the alpha channel. Color under alpha 0 is kept.</p>
+                <h4>Filters</h4>
+                <div class="signature">blur (a_radius: INTEGER)</div>
+                <p>Three box passes of the radius (close to a gaussian of sigma about the radius); premultiplied in float in the kernel.</p>
+                <div class="signature">enhance_brightness (a_factor: REAL_64)</div>
+                <p>0 gives black, 1 leaves the image (PIL ImageEnhance.Brightness).</p>
+                <div class="signature">enhance_contrast (a_factor: REAL_64)</div>
+                <p>0 gives flat gray, 1 leaves the image (PIL ImageEnhance.Contrast).</p>
+                <div class="signature">enhance_color (a_factor: REAL_64)</div>
+                <p>0 gives grayscale, 1 leaves the image (PIL ImageEnhance.Color).</p>
+                <div class="signature">vignette (a_strength: REAL_64)</div>
+                <p>Darken toward the corners: a corner keeps 1 - strength of its brightness.</p>
+                <div class="signature">flatten_onto (a_background: NATURAL_32)</div>
+                <p>Composite onto an opaque color (0x__RRGGBB); the result is opaque.</p>
+                <h4>New images</h4>
+                <div class="signature">cropped (a_x, a_y, a_width, a_height: INTEGER): IMG_IMAGE</div>
+                <p>A new image of the given rectangle.</p>
+                <div class="signature">resized (a_width, a_height: INTEGER): IMG_IMAGE</div>
+                <p>Scaled with Lanczos-3, premultiplied in float so soft edges keep their color.</p>
+                <h4>Files</h4>
+                <div class="signature">save_png (a_path: READABLE_STRING_GENERAL): BOOLEAN</div>
+                <p>Write as PNG (alpha kept); True on success.</p>
+                <div class="signature">save_jpg (a_path: READABLE_STRING_GENERAL; a_quality: INTEGER): BOOLEAN</div>
+                <p>Write as JPEG at quality 1-100; requires an opaque image, so flatten first.</p>
+                <h4>Duplication and removal</h4>
+                <div class="signature">copy (a_other: like Current)</div>
+                <p>Make this image a separate copy of the other&#x27;s pixels.</p>
+                <div class="signature">is_equal (a_other: like Current): BOOLEAN</div>
+                <p>Same size and same pixels?</p>
+                <div class="signature">destroy</div>
+                <p>Free the pixels now (the garbage collector frees them otherwise).</p>
+            </div>
+            <div class="api-section">
+                <h3>IMG_MASK</h3>
+                <p>A mask: one 8-bit channel (0 = none, 255 = full), in C memory. Carries cutouts, halos, shadows and outlines.</p>
+
+                <h4>Initialization</h4>
+                <div class="signature">make (a_width, a_height: INTEGER)</div>
+                <p>Empty (all 0) mask.</p>
+                <div class="signature">make_filled (a_width, a_height: INTEGER; a_value: NATURAL_8)</div>
+                <p>Mask with every value set to a_value.</p>
+                <div class="signature">make_from_floats (a_floats: POINTER; a_width, a_height: INTEGER)</div>
+                <p>From float32 values, stretched so the lowest becomes 0 and the highest 255.</p>
+                <h4>Access</h4>
+                <div class="signature">width: INTEGER</div>
+                <div class="signature">height: INTEGER</div>
+                <div class="signature">pixel_count: INTEGER</div>
+                <div class="signature">values: POINTER</div>
+                <p>Address of the first value (rows packed, one byte each).</p>
+                <div class="signature">value (a_x, a_y: INTEGER): NATURAL_8</div>
+                <p>Value at the position.</p>
+                <div class="signature">count_at_least (a_level: INTEGER): INTEGER</div>
+                <p>Number of values &gt;= a_level.</p>
+                <div class="signature">last_piece_size: INTEGER</div>
+                <p>Size of the piece kept by the last keep_largest_piece.</p>
+                <h4>Status</h4>
+                <div class="signature">is_usable: BOOLEAN</div>
+                <div class="signature">is_inside (a_x, a_y, a_width, a_height: INTEGER): BOOLEAN</div>
+                <p>Does the rectangle lie wholly inside the mask?</p>
+                <h4>Values</h4>
+                <div class="signature">set_value (a_x, a_y: INTEGER; a_value: NATURAL_8)</div>
+                <p>Set the value at the position.</p>
+                <div class="signature">fill (a_value: NATURAL_8)</div>
+                <p>Set every value to a_value.</p>
+                <h4>Filters</h4>
+                <div class="signature">blur (a_radius: INTEGER)</div>
+                <p>Soften with three box passes of the radius.</p>
+                <div class="signature">grow (a_amount: INTEGER)</div>
+                <p>Widen the mask by a_amount pixels (largest value over a square).</p>
+                <div class="signature">shrink (a_amount: INTEGER)</div>
+                <p>Narrow the mask by a_amount pixels (smallest value over a square).</p>
+                <div class="signature">threshold (a_level: INTEGER)</div>
+                <p>Make values &gt;= a_level 255 and the rest 0.</p>
+                <div class="signature">invert</div>
+                <p>Replace each value v with 255 - v.</p>
+                <div class="signature">flood_fill (a_x, a_y: INTEGER; a_value: NATURAL_8)</div>
+                <p>Set the 4-connected region of equal values at the position to a_value.</p>
+                <div class="signature">keep_largest_piece (a_level: INTEGER)</div>
+                <p>Keep only the largest 4-connected piece of values &gt;= a_level (with its soft edge, up to 2 pixels out).</p>
+                <h4>New masks</h4>
+                <div class="signature">cropped (a_x, a_y, a_width, a_height: INTEGER): IMG_MASK</div>
+                <p>A new mask of the given rectangle.</p>
+                <div class="signature">resized (a_width, a_height: INTEGER): IMG_MASK</div>
+                <p>Scaled with Lanczos-3.</p>
+                <h4>Files, duplication and removal</h4>
+                <div class="signature">save_png (a_path: READABLE_STRING_GENERAL): BOOLEAN</div>
+                <p>Write as a grayscale PNG; True on success.</p>
+                <div class="signature">copy (a_other: like Current)</div>
+                <p>Make this mask a separate copy of the other&#x27;s values.</p>
+                <div class="signature">is_equal (a_other: like Current): BOOLEAN</div>
+                <p>Same size and same values?</p>
+                <div class="signature">destroy</div>
+                <p>Free the values now.</p>
+            </div>
+            <div class="api-section">
+                <h3>IMG_CANVAS</h3>
+                <p>A drawing surface on simple_cairo, reached by copying: cairo is a seam, not the store. A color canvas holds ARGB32; a mask canvas holds A8.</p>
+
+                <h4>Initialization</h4>
+                <div class="signature">make (a_width, a_height: INTEGER)</div>
+                <p>Transparent color canvas.</p>
+                <div class="signature">make_mask (a_width, a_height: INTEGER)</div>
+                <p>Empty mask canvas (A8): whatever is drawn becomes coverage.</p>
+                <div class="signature">make_from (a_image: IMG_IMAGE)</div>
+                <p>Color canvas holding a copy of the image.</p>
+                <h4>Access</h4>
+                <div class="signature">width: INTEGER</div>
+                <div class="signature">height: INTEGER</div>
+                <div class="signature">is_mask: BOOLEAN</div>
+                <p>Is this an A8 mask canvas (rather than ARGB32 color)?</p>
+                <div class="signature">context: CAIRO_CONTEXT</div>
+                <p>For text, shapes and paths (simple_cairo).</p>
+                <div class="signature">is_usable: BOOLEAN</div>
+                <h4>Drawing</h4>
+                <div class="signature">place (a_image: IMG_IMAGE; a_x, a_y: REAL_64)</div>
+                <p>Paint the image over the canvas with its top-left corner at the position.</p>
+                <div class="signature">place_sized (a_image: IMG_IMAGE; a_x, a_y: REAL_64; a_width, a_height: INTEGER)</div>
+                <p>Paint the image scaled (Lanczos-3) at the position.</p>
+                <div class="signature">fill_through (a_mask: IMG_MASK; a_colour: NATURAL_32; a_x, a_y: REAL_64)</div>
+                <p>Paint a color through the mask: halos, shadows, glows and text shadows.</p>
+                <div class="signature">fill (a_colour: NATURAL_32)</div>
+                <p>Paint the whole canvas with the color over what is there.</p>
+                <h4>Results and removal</h4>
+                <div class="signature">to_image: IMG_IMAGE</div>
+                <p>A new image holding the canvas (straight alpha); color canvases only.</p>
+                <div class="signature">to_mask: IMG_MASK</div>
+                <p>A new mask holding the canvas&#x27;s coverage; mask canvases only.</p>
+                <div class="signature">destroy</div>
+                <p>Release the cairo context and surface.</p>
+            </div>
+            <div class="api-section">
+                <h3>IMG_KERNELS</h3>
+                <p>
+                    The per-pixel kernels: inline-C calls into <code>Clib/simple_image.h</code>, inherited
+                    (non-conforming) by IMG_IMAGE, IMG_MASK and IMG_CANVAS. All its features are
+                    implementation-only; there is no public API.
+                </p>
+            </div>
+        </section>
+
+        <section id="design">
+            <h2>Design Notes</h2>
+            <p>
+                The design came from an <code>/eiffel.debate</code> cycle, recorded in <code>.eiffel-workflow/debate/</code>.
+                Each decision was settled by measurement on 2026-10-11.
+            </p>
+                <table class="api-table">
+                    <tr><th>Decision</th><th>Evidence</th></tr>
+                    <tr><td>Pixels stay straight RGBA in C memory, not in a cairo surface</td><td>Premultiplied 8-bit storage loses a mean of 30 levels of color at alpha 1-10</td></tr>
+                    <tr><td>Every kernel that mixes soft-alpha pixels premultiplies in float inside the loop</td><td>A straight blur turns a red edge dark (R 90 instead of 255)</td></tr>
+                    <tr><td>Glows and shadows are a mask plus a color fill</td><td>Within 0.2 levels of a float premultiplied blur</td></tr>
+                    <tr><td>Per-pixel loops in C, contracts on the Eiffel features</td><td>Eiffel loops with contracts on ran 3.6-4.4 times slower</td></tr>
+                    <tr><td>Our own Lanczos-3, not cairo's scaler</td><td>cairo's best filter is off by up to 61 levels on mask edges; ours by 4 against PIL</td></tr>
+                </table>
+        </section>
+
+        <section id="testing">
+            <h2>Testing</h2>
+            <pre><code>/d/prod/ec.sh test -config simple_image.ecf -target simple_image_tests
+PATH="/d/prod/simple_cairo:$PATH" ./EIFGENs/simple_image_tests/F_code/simple_image.exe   # from the library root</code></pre>
+            <p>
+                27 tests. They write to <code>data/output/</code>. The soft-edge tests were checked by breaking the kernel
+                rule on purpose: a straight-color blur and resize fail them.
+            </p>
+
+            <h3>Dependencies</h3>
+            <ul>
+                <li><a href="https://github.com/simple-eiffel/simple_stb">simple_stb</a> 1.1.0 or later (images free themselves; the stb implementation is static, so clients link)</li>
+                <li><a href="https://github.com/simple-eiffel/simple_cairo">simple_cairo</a> 1.4.0 or later (<code>text_path</code>)</li>
+                <li>EiffelBase</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 simple_* ecosystem. MIT License.</p>
+        <p>Built on simple_stb (stb libraries by Sean Barrett, public domain) and simple_cairo.</p>
+        <p>
+            <a href="https://github.com/simple-eiffel/simple_image">GitHub</a> |
+            <a href="https://simple-eiffel.github.io">Documentation</a>
+        </p>
+    </footer>
+</body>
+</html>
