@@ -1,0 +1,3 @@
+float identity: max |blur(c*a) - c*blur(a)| = 2.842170943040401e-14
+mask path (8-bit mask) vs premult reference, flattened: max 0.20 mean 0.014 levels
+naive straight blur vs reference, flattened:            max 50.00 mean 3.024 levels

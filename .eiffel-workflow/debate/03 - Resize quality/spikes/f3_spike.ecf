@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<system xmlns="http://www.eiffel.com/developers/xml/configuration/22" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration/22 http://www.eiffel.com/developers/xml/configuration/22/configuration.xsd" name="f3_spike" uuid="5A1D0F40-0000-4F4A-9F44-2026101100F3">
+	<description>Spike F3: resize quality, cairo Filter_best versus Lanczos-3</description>
+	<target name="f3_spike">
+		<root class="F3_SPIKE" feature="make"/>
+		<option warning="warning" void_safety="all">
+			<assertions precondition="true" postcondition="true" invariant="true"/>
+		</option>
+		<capability>
+			<concurrency support="scoop"/>
+			<void_safety support="all"/>
+		</capability>
+		<library name="base" location="$ISE_LIBRARY/library/base/base.ecf"/>
+		<library name="simple_cairo" location="$SIMPLE_EIFFEL/simple_cairo/simple_cairo.ecf"/>
+		<cluster name="spike" location=".\src\"/>
+	</target>
+</system>

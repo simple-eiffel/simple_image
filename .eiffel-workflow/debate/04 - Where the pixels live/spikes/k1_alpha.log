@@ -1,0 +1,12 @@
+a in 1..254, c in 0..255: max err 127 mean err 1.4722
+ alpha 1-3: max 127 mean 38.805  distinct output levels at a=1: 2
+ alpha 1-10: max 127 mean 18.598  distinct output levels at a=1: 2
+ alpha 11-50: max 12 mean 2.483  distinct output levels at a=11: 12
+ alpha 51-127: max 2 mean 0.739  distinct output levels at a=51: 52
+ alpha 128-254: max 1 mean 0.250  distinct output levels at a=128: 129
+ alpha=1: output colour levels [0, 255]
+edge pixels alpha 10-200: 624
+(i) straight blur  : R mean 90.6 min 13.0  (true colour R=255)
+(ii) premult blur  : R mean 255.0 min 255.0  n=624
+example row y=32, x=14..22 (i):  [[3, 0, 0, 3], [31, 0, 0, 31], [60, 0, 0, 60], [88, 0, 0, 88], [116, 0, 0, 116], [145, 0, 0, 145], [173, 0, 0, 173], [201, 0, 0, 201], [230, 0, 0, 230]]
+example row y=32, x=14..22 (ii): [[255, 0, 0, 3], [255, 0, 0, 31], [255, 0, 0, 60], [255, 0, 0, 88], [255, 0, 0, 116], [255, 0, 0, 145], [255, 0, 0, 173], [255, 0, 0, 201], [255, 0, 0, 230]]

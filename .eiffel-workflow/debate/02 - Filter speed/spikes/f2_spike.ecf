@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<system xmlns="http://www.eiffel.com/developers/xml/configuration/22" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration/22 http://www.eiffel.com/developers/xml/configuration/22/configuration.xsd" name="f2_spike" uuid="5A1D0F40-0000-4F4A-9F44-2026101100F2">
+	<description>Spike F2: filter speed, pure Eiffel versus inline C</description>
+	<target name="f2_spike">
+		<root class="F2_SPIKE" feature="make"/>
+		<option warning="warning" void_safety="all">
+			<assertions precondition="true" postcondition="true" invariant="true"/>
+		</option>
+		<capability>
+			<concurrency support="scoop"/>
+			<void_safety support="all"/>
+		</capability>
+		<library name="base" location="$ISE_LIBRARY/library/base/base.ecf"/>
+		<cluster name="spike" location=".\src\"/>
+	</target>
+</system>

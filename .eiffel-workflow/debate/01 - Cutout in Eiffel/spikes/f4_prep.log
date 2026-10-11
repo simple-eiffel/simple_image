@@ -1,0 +1,2 @@
+python onnxruntime 1.23.2: 239 ms
+wrote in.f32 (307200 floats) and ref.f32 (102400 floats)

@@ -1,0 +1,6 @@
+input floats: 307200
+model loaded: True in 303 ms
+run 1: 204 ms, success True
+output floats: 102400
+run 2: 169 ms, success True
+run 3: 165 ms, success True

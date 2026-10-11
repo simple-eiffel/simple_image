@@ -1,0 +1,3 @@
+sizes: ref 102400, eiffel 102400
+max abs diff 5.364e-07, mean abs diff 1.473e-08
+mask IoU at 0.5: 1.00000 (person pixels: ref 51186, eiffel 51186)

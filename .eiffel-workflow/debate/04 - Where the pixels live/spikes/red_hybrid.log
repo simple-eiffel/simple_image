@@ -1,0 +1,5 @@
+out alpha 1-10 n= 18988  mean|err| vs float ref: B(8bit premult storage)=30.35 max=217 | H(straight+float kernel)=0.25 | A-naive straight blur=2.53
+out alpha 11-50 n= 15952  mean|err| vs float ref: B(8bit premult storage)=3.40 max=20 | H(straight+float kernel)=0.25 | A-naive straight blur=1.13
+out alpha 51-254 n= 16321  mean|err| vs float ref: B(8bit premult storage)=0.74 max=5 | H(straight+float kernel)=0.26 | A-naive straight blur=0.66
+flattened over grey: max abs level err  B=0.8  H=0.5
+flattened over grey: mean abs level err B=0.211  H=0.040

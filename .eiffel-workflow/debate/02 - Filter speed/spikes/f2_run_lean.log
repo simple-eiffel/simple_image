@@ -1,0 +1,4 @@
+blur 1280x720 RGBA, 3 box passes r=13, Eiffel: 61 ms
+blur, inline C: 58 ms; same pixels: True
+grow alpha 1280x720, size 17, Eiffel: 18 ms
+grow, inline C: 18 ms; same pixels: True

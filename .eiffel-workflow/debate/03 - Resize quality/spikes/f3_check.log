@@ -1,0 +1,4 @@
+A mask up    cairo    mean abs diff 0.363  max 61  (pixels off by >8: 1.316%)
+A mask up    lanczos  mean abs diff 0.011  max 4  (pixels off by >8: 0.000%)
+B frame down cairo    mean abs diff 0.350  max 21  (pixels off by >8: 0.076%)
+B frame down lanczos  mean abs diff 0.135  max 3  (pixels off by >8: 0.000%)

@@ -1,0 +1,24 @@
+# Pre-Phase Debate Evidence
+# Project: D:\prod\simple_image (with simple_image_ai)
+# Date: 2026-10-11
+# ROE: General Research ROE v1.0 (read 2026-10-11); seats read ROE-CARD v1.0 (gated)
+
+Decisions settled by spike (main thread, no seats):
+  01 Cutout in Eiffel  - simple_onnx runs u2net_human_seg exactly (max diff 5.4e-7, IoU 1.0, 165-204 ms) - ESTABLISHED 0.95/0.95
+  02 Filter speed      - per-pixel kernels in inline C (contracts-on Eiffel 3.6-4.4x slower; lean ties C) - ESTABLISHED 0.90/0.95
+  03 Resize quality    - own Lanczos-3 in C (max 4 vs PIL; cairo Filter_best max 61 on mask edges) - ESTABLISHED 0.90/0.95
+
+Decision debated: 04 - Where the pixels live
+Mode: code-lite
+Agents: 5   Adversarial condition: C3 (C2 with the executed-evidence proposal)
+Budget: gather debate-seat/sonnet 50,571 | BLUE debate-seat/sonnet 34,867 | RED debate-seat/sonnet 51,396 |
+        rebuttal debate-seat/sonnet 40,201 | adjudicator debate-adjudicator/opus 79,436 | cycle total 256,471
+        (estimate was 150-200k: over by ~28%). Session model: Opus (orchestrator).
+        Pre-cycle inventory agent (Explore, general research, not a seat): 135,384.
+Decisions: 04: H (straight RGBA8 in C memory, ops in simple_image, float-premultiplied kernels, cairo as a copy seam,
+           masks + fill for halos/shadows, cairo_text_path in simple_cairo, IMG_CUTOUT in simple_image_ai) - PREFERRED - 0.80/0.85
+Do-not-assume entries: 8
+Spikes run: 3 settled-by-spike (f2, f3, f4) + 3 in-cycle numeric (k1_alpha, red_hybrid, adj_mask_fill)
+Larry's gate: APPROVED 2026-10-11 ("1. yes": adopt H as adjudicated); proposal 2 (executed evidence = external confrontation) APPROVED 2026-10-11 ("I thought the spikes proved the points one way or the other and not just AI or human guessing, speculation, or opinion?"), with the safeguard: output pasted and the run could have failed. Condition: C2
+
+# Status: GATED
