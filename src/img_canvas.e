@@ -6,7 +6,7 @@ note
 		and the result is copied out once at the end (unpremultiplied). Opaque results copy
 		out within 0.8 levels; A8 masks copy both ways exactly.
 
-		A colour canvas holds ARGB32; a mask canvas holds A8, so text or shapes drawn on it
+		A color canvas holds ARGB32; a mask canvas holds A8, so text or shapes drawn on it
 		become a mask (`to_mask'): the way to make text shadows and glows.
 
 		Usage:
@@ -38,7 +38,7 @@ create
 feature {NONE} -- Initialization
 
 	make (a_width, a_height: INTEGER)
-			-- Transparent colour canvas of `a_width' x `a_height'.
+			-- Transparent color canvas of `a_width' x `a_height'.
 		require
 			width_positive: a_width > 0
 			height_positive: a_height > 0
@@ -51,7 +51,7 @@ feature {NONE} -- Initialization
 		ensure
 			width_set: width = a_width
 			height_set: height = a_height
-			colour: not is_mask
+			color: not is_mask
 		end
 
 	make_mask (a_width, a_height: INTEGER)
@@ -73,7 +73,7 @@ feature {NONE} -- Initialization
 		end
 
 	make_from (a_image: IMG_IMAGE)
-			-- Colour canvas holding a copy of `a_image'.
+			-- Color canvas holding a copy of `a_image'.
 		require
 			image_usable: a_image.is_usable
 		do
@@ -95,7 +95,7 @@ feature -- Access
 			-- Height in pixels.
 
 	is_mask: BOOLEAN
-			-- Is this an A8 mask canvas (rather than ARGB32 colour)?
+			-- Is this an A8 mask canvas (rather than ARGB32 color)?
 
 	context: CAIRO_CONTEXT
 			-- For text, shapes and paths (simple_cairo).
@@ -114,7 +114,7 @@ feature -- Drawing
 			-- Paint `a_image' over the canvas with its top-left corner at (`a_x', `a_y').
 		require
 			usable: is_usable
-			colour_canvas: not is_mask
+			color_canvas: not is_mask
 			image_usable: a_image.is_usable
 		local
 			l_layer: CAIRO_SURFACE
@@ -132,7 +132,7 @@ feature -- Drawing
 			-- Paint `a_image' scaled to `a_width' x `a_height' (Lanczos-3) at (`a_x', `a_y').
 		require
 			usable: is_usable
-			colour_canvas: not is_mask
+			color_canvas: not is_mask
 			image_usable: a_image.is_usable
 			width_positive: a_width > 0
 			height_positive: a_height > 0
@@ -148,8 +148,8 @@ feature -- Drawing
 			end
 		end
 
-	fill_through (a_mask: IMG_MASK; a_colour: NATURAL_32; a_x, a_y: REAL_64)
-			-- Paint `a_colour' (0xAARRGGBB) through `a_mask' placed at (`a_x', `a_y'):
+	fill_through (a_mask: IMG_MASK; a_color: NATURAL_32; a_x, a_y: REAL_64)
+			-- Paint `a_color' (0xAARRGGBB) through `a_mask' placed at (`a_x', `a_y'):
 			-- halos, shadows, glows and text shadows.
 		require
 			usable: is_usable
@@ -162,18 +162,18 @@ feature -- Drawing
 			l_coverage.flush.do_nothing
 			c_copy_rows (a_mask.values, a_mask.width, l_coverage.data, l_coverage.stride, a_mask.width, a_mask.height)
 			l_coverage.mark_dirty.do_nothing
-			context.save.set_color_rgba (channel (a_colour, 16), channel (a_colour, 8), channel (a_colour, 0),
-				channel (a_colour, 24)).mask_surface (l_coverage, a_x, a_y).restore.do_nothing
+			context.save.set_color_rgba (channel (a_color, 16), channel (a_color, 8), channel (a_color, 0),
+				channel (a_color, 24)).mask_surface (l_coverage, a_x, a_y).restore.do_nothing
 			l_coverage.destroy
 		end
 
-	fill (a_colour: NATURAL_32)
-			-- Paint the whole canvas with `a_colour' (0xAARRGGBB) over what is there.
+	fill (a_color: NATURAL_32)
+			-- Paint the whole canvas with `a_color' (0xAARRGGBB) over what is there.
 		require
 			usable: is_usable
 		do
-			context.save.set_color_rgba (channel (a_colour, 16), channel (a_colour, 8), channel (a_colour, 0),
-				channel (a_colour, 24)).paint.restore.do_nothing
+			context.save.set_color_rgba (channel (a_color, 16), channel (a_color, 8), channel (a_color, 0),
+				channel (a_color, 24)).paint.restore.do_nothing
 		end
 
 feature -- Results
@@ -182,7 +182,7 @@ feature -- Results
 			-- A new image holding the canvas (straight alpha).
 		require
 			usable: is_usable
-			colour_canvas: not is_mask
+			color_canvas: not is_mask
 		do
 			create Result.make (width, height)
 			surface.flush.do_nothing
@@ -220,12 +220,12 @@ feature {NONE} -- Implementation
 	surface: CAIRO_SURFACE
 			-- The pixels (premultiplied ARGB32, or A8).
 
-	channel (a_colour: NATURAL_32; a_shift: INTEGER): REAL_64
-			-- The 8-bit channel of `a_colour' at `a_shift', as 0.0-1.0.
+	channel (a_color: NATURAL_32; a_shift: INTEGER): REAL_64
+			-- The 8-bit channel of `a_color' at `a_shift', as 0.0-1.0.
 		require
 			valid_shift: a_shift = 0 or a_shift = 8 or a_shift = 16 or a_shift = 24
 		do
-			Result := ((a_colour |>> a_shift) & 0xFF).to_real_64 / 255.0
+			Result := ((a_color |>> a_shift) & 0xFF).to_real_64 / 255.0
 		ensure
 			in_range: Result >= 0.0 and Result <= 1.0
 		end

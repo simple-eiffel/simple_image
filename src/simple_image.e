@@ -98,7 +98,7 @@ feature -- Creation
 		end
 
 	new_canvas (a_width, a_height: INTEGER): IMG_CANVAS
-			-- A transparent colour canvas.
+			-- A transparent color canvas.
 		require
 			width_positive: a_width > 0
 			height_positive: a_height > 0
@@ -118,7 +118,7 @@ feature -- Creation
 		end
 
 	canvas_from (a_image: IMG_IMAGE): IMG_CANVAS
-			-- A colour canvas holding a copy of `a_image'.
+			-- A color canvas holding a copy of `a_image'.
 		require
 			image_usable: a_image.is_usable
 		do

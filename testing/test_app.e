@@ -24,14 +24,14 @@ feature {NONE} -- Initialization
 			run_test (agent l_tests.test_pixel_round_trip, "test_pixel_round_trip")
 			run_test (agent l_tests.test_twin_is_independent, "test_twin_is_independent")
 			run_test (agent l_tests.test_cropped, "test_cropped")
-			run_test (agent l_tests.test_set_alpha_keeps_colour, "test_set_alpha_keeps_colour")
+			run_test (agent l_tests.test_set_alpha_keeps_color, "test_set_alpha_keeps_color")
 			run_test (agent l_tests.test_flatten_onto, "test_flatten_onto")
 
 			io.put_string ("Filters:%N")
-			run_test (agent l_tests.test_blur_keeps_colour_at_soft_edges, "test_blur_keeps_colour_at_soft_edges")
+			run_test (agent l_tests.test_blur_keeps_color_at_soft_edges, "test_blur_keeps_color_at_soft_edges")
 			run_test (agent l_tests.test_blur_matches_float_reference, "test_blur_matches_float_reference")
-			run_test (agent l_tests.test_resize_keeps_solid_colour, "test_resize_keeps_solid_colour")
-			run_test (agent l_tests.test_resize_keeps_colour_at_soft_edges, "test_resize_keeps_colour_at_soft_edges")
+			run_test (agent l_tests.test_resize_keeps_solid_color, "test_resize_keeps_solid_color")
+			run_test (agent l_tests.test_resize_keeps_color_at_soft_edges, "test_resize_keeps_color_at_soft_edges")
 			run_test (agent l_tests.test_enhance, "test_enhance")
 			run_test (agent l_tests.test_vignette, "test_vignette")
 

@@ -2,8 +2,8 @@ note
 	description: "[
 		A mask: one 8-bit channel (0 = none, 255 = full), in C memory.
 
-		Masks carry cutouts, halos, shadows and outlines. A solid-colour layer drawn as a
-		mask plus a colour fill (IMG_CANVAS.fill_through) is exact (debate 04: within 0.2
+		Masks carry cutouts, halos, shadows and outlines. A solid-color layer drawn as a
+		mask plus a color fill (IMG_CANVAS.fill_through) is exact (debate 04: within 0.2
 		levels of a float premultiplied blur), so shadows and glows are mask work, never
 		RGBA blurs.
 

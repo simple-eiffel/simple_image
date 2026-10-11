@@ -6,7 +6,7 @@
  *
  * Images are straight (non-premultiplied) RGBA8, rows packed (stride = w * 4).
  * Masks are one 8-bit channel, rows packed (stride = w).
- * Any kernel that mixes neighbouring RGBA pixels premultiplies in float inside
+ * Any kernel that mixes neighboring RGBA pixels premultiplies in float inside
  * the loop and stores straight (debate 04 verdict, kernel rule).
  * Every allocating kernel returns 1 on success, 0 when memory ran out.
  */
@@ -219,7 +219,7 @@ static int img_resize_rgba (const unsigned char *in, int w, int h, unsigned char
 	img_rgba_to_premul_f (in, (size_t) w * h, fi);
 	if (!img_lanczos_f (fi, w, h, 4, fo, ow, oh)) { free (fi); free (fo); return 0; }
 	for (i = 0; i < n; i++) {
-		/* Lanczos rings: keep premultiplied colour within [0, alpha] before dividing */
+		/* Lanczos rings: keep premultiplied color within [0, alpha] before dividing */
 		float a = fo[i * 4 + 3];
 		int c;
 		if (a < 0.0f) a = 0.0f;
@@ -262,7 +262,7 @@ static double img_mean_gray (const unsigned char *p, size_t n) {
 	return n == 0 ? 0.0 : floor (sum / n + 0.5);
 }
 
-/* mode 1 brightness (degenerate black), 2 contrast (degenerate mean gray), 3 colour (degenerate own gray) */
+/* mode 1 brightness (degenerate black), 2 contrast (degenerate mean gray), 3 color (degenerate own gray) */
 static void img_enhance (unsigned char *p, size_t n, int mode, double f, double mean) {
 	size_t i;
 	int c;

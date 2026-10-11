@@ -3,12 +3,12 @@ note
 		An image: straight (non-premultiplied) RGBA, 8 bits per channel, in C memory.
 
 		The pixels live in a private STB_IMAGE (simple_stb), so loading and saving need no
-		conversion, and straight storage keeps colour at every alpha level (debate 04: a
-		premultiplied 8-bit store loses a mean of 30 levels of colour at alpha 1-10).
+		conversion, and straight storage keeps color at every alpha level (debate 04: a
+		premultiplied 8-bit store loses a mean of 30 levels of color at alpha 1-10).
 		Every editing operation lives here; drawing (text, shapes, placing layers) goes
 		through IMG_CANVAS, which copies into cairo and back.
 
-		Colours are NATURAL_32 words 0xAARRGGBB with straight alpha.
+		Colors are NATURAL_32 words 0xAARRGGBB with straight alpha.
 
 		Usage:
 			image := (create {SIMPLE_IMAGE}.make).load ("photo.jpg")
@@ -64,18 +64,18 @@ feature {NONE} -- Initialization
 			usable: is_usable
 		end
 
-	make_filled (a_width, a_height: INTEGER; a_colour: NATURAL_32)
-			-- Image of `a_width' x `a_height' filled with `a_colour' (0xAARRGGBB).
+	make_filled (a_width, a_height: INTEGER; a_color: NATURAL_32)
+			-- Image of `a_width' x `a_height' filled with `a_color' (0xAARRGGBB).
 		require
 			width_positive: a_width > 0
 			height_positive: a_height > 0
 		do
 			make (a_width, a_height)
-			fill (a_colour)
+			fill (a_color)
 		ensure
 			width_set: width = a_width
 			height_set: height = a_height
-			filled: pixel (0, 0) = a_colour
+			filled: pixel (0, 0) = a_color
 		end
 
 	make_from_stb (a_stb: STB_IMAGE)
@@ -125,7 +125,7 @@ feature -- Access
 		end
 
 	pixel (a_x, a_y: INTEGER): NATURAL_32
-			-- Colour at (`a_x', `a_y') as 0xAARRGGBB, straight alpha.
+			-- Color at (`a_x', `a_y') as 0xAARRGGBB, straight alpha.
 		require
 			usable: is_usable
 			x_in: a_x >= 0 and a_x < width
@@ -170,31 +170,31 @@ feature -- Status
 
 feature -- Pixels
 
-	set_pixel (a_x, a_y: INTEGER; a_colour: NATURAL_32)
-			-- Set the colour at (`a_x', `a_y') to `a_colour' (0xAARRGGBB).
+	set_pixel (a_x, a_y: INTEGER; a_color: NATURAL_32)
+			-- Set the color at (`a_x', `a_y') to `a_color' (0xAARRGGBB).
 		require
 			usable: is_usable
 			x_in: a_x >= 0 and a_x < width
 			y_in: a_y >= 0 and a_y < height
 		do
-			c_set_argb (pixels, width, a_x, a_y, a_colour)
+			c_set_argb (pixels, width, a_x, a_y, a_color)
 		ensure
-			set: pixel (a_x, a_y) = a_colour
+			set: pixel (a_x, a_y) = a_color
 		end
 
-	fill (a_colour: NATURAL_32)
-			-- Set every pixel to `a_colour' (0xAARRGGBB).
+	fill (a_color: NATURAL_32)
+			-- Set every pixel to `a_color' (0xAARRGGBB).
 		require
 			usable: is_usable
 		do
-			c_fill_rgba (pixels, pixel_count, a_colour)
+			c_fill_rgba (pixels, pixel_count, a_color)
 		ensure
-			corner_set: pixel (0, 0) = a_colour
-			far_corner_set: pixel (width - 1, height - 1) = a_colour
+			corner_set: pixel (0, 0) = a_color
+			far_corner_set: pixel (width - 1, height - 1) = a_color
 		end
 
 	set_alpha (a_mask: IMG_MASK)
-			-- Use `a_mask' as the alpha channel. Colour under alpha 0 is kept.
+			-- Use `a_mask' as the alpha channel. Color under alpha 0 is kept.
 		require
 			usable: is_usable
 			mask_usable: a_mask.is_usable
@@ -209,7 +209,7 @@ feature -- Filters
 
 	blur (a_radius: INTEGER)
 			-- Blur with three box passes of `a_radius' (close to a gaussian of sigma ~ `a_radius').
-			-- Colour is premultiplied in float inside the kernel, so soft edges keep their colour.
+			-- Color is premultiplied in float inside the kernel, so soft edges keep their color.
 		require
 			usable: is_usable
 			radius_not_negative: a_radius >= 0
@@ -256,7 +256,7 @@ feature -- Filters
 		end
 
 	flatten_onto (a_background: NATURAL_32)
-			-- Composite onto the opaque colour `a_background' (0x__RRGGBB); the result is opaque.
+			-- Composite onto the opaque color `a_background' (0x__RRGGBB); the result is opaque.
 		require
 			usable: is_usable
 		do
@@ -283,7 +283,7 @@ feature -- New images
 
 	resized (a_width, a_height: INTEGER): IMG_IMAGE
 			-- A new image scaled to `a_width' x `a_height' with Lanczos-3 (debate 03 verdict),
-			-- premultiplied in float so soft edges keep their colour.
+			-- premultiplied in float so soft edges keep their color.
 		require
 			usable: is_usable
 			width_positive: a_width > 0

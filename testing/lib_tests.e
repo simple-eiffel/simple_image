@@ -1,7 +1,7 @@
 note
 	description: "[
 		Tests for simple_image. Each kernel is pinned by a property that the wrong design would
-		fail: soft edges keep their colour after blur and resize (a straight 8-bit blur darkens
+		fail: soft edges keep their color after blur and resize (a straight 8-bit blur darkens
 		them), the blur matches an independent float reference within 1 level (the kernel rule),
 		and the cairo seam round-trips opaque pixels exactly.
 	]"
@@ -40,7 +40,7 @@ feature -- Images
 			assert ("opaque", l_image.is_opaque)
 			l_image.set_pixel (1, 1, 0x80A0B0C0)
 			assert ("pixel set", l_image.pixel (1, 1) = 0x80A0B0C0)
-			assert ("neighbour untouched", l_image.pixel (2, 1) = 0xFF102030)
+			assert ("neighbor untouched", l_image.pixel (2, 1) = 0xFF102030)
 		end
 
 	test_twin_is_independent
@@ -77,8 +77,8 @@ feature -- Images
 			assert ("mask value", l_mask_part.value (1, 1) = 200)
 		end
 
-	test_set_alpha_keeps_colour
-			-- alpha and set_alpha round-trip; colour under alpha 0 is kept (a cutout can be re-grown).
+	test_set_alpha_keeps_color
+			-- alpha and set_alpha round-trip; color under alpha 0 is kept (a cutout can be re-grown).
 		local
 			l_image: IMG_IMAGE
 			l_mask: IMG_MASK
@@ -89,7 +89,7 @@ feature -- Images
 			l_image.set_alpha (l_mask)
 			assert ("alpha read back", l_image.alpha.is_equal (l_mask))
 			assert ("soft pixel", l_image.pixel (2, 2) = 0x4D00FF00)
-			assert ("colour kept under alpha 0", l_image.pixel (0, 0) = 0x0000FF00)
+			assert ("color kept under alpha 0", l_image.pixel (0, 0) = 0x0000FF00)
 		end
 
 	test_flatten_onto
@@ -105,7 +105,7 @@ feature -- Images
 
 feature -- Filters
 
-	test_blur_keeps_colour_at_soft_edges
+	test_blur_keeps_color_at_soft_edges
 			-- A red square on transparent black, blurred: every visible pixel is still pure red.
 			-- A straight 8-bit blur fails this (its edges turn dark red: R 90 instead of 255).
 		local
@@ -158,8 +158,8 @@ feature -- Filters
 			assert ("within 1 level, worst " + l_worst.out, l_worst <= 1)
 		end
 
-	test_resize_keeps_solid_colour
-			-- Lanczos weights sum to 1: a solid image resizes to exactly the same colour.
+	test_resize_keeps_solid_color
+			-- Lanczos weights sum to 1: a solid image resizes to exactly the same color.
 		local
 			l_image, l_small: IMG_IMAGE
 			x, y: INTEGER
@@ -179,7 +179,7 @@ feature -- Filters
 			assert ("upscale too", l_image.resized (61, 43).pixel (40, 30) = 0xFF336699)
 		end
 
-	test_resize_keeps_colour_at_soft_edges
+	test_resize_keeps_color_at_soft_edges
 			-- Resizing a red square on transparent black keeps every visible pixel pure red.
 		local
 			l_image, l_small: IMG_IMAGE
@@ -203,7 +203,7 @@ feature -- Filters
 		end
 
 	test_enhance
-			-- Brightness, contrast and colour follow PIL ImageEnhance.
+			-- Brightness, contrast and color follow PIL ImageEnhance.
 		local
 			l_image: IMG_IMAGE
 		do
@@ -213,7 +213,7 @@ feature -- Filters
 
 			create l_image.make_filled (4, 4, 0xFFFF0000)
 			l_image.enhance_color (0)
-			assert ("colour 0 is gray: " + l_image.pixel (0, 0).to_hex_string, l_image.pixel (0, 0) = 0xFF4C4C4C)
+			assert ("color 0 is gray: " + l_image.pixel (0, 0).to_hex_string, l_image.pixel (0, 0) = 0xFF4C4C4C)
 
 			create l_image.make_filled (4, 2, 0xFF000000)
 			fill_rect (l_image, 0, 1, 4, 1, 0xFFC8C8C8)
@@ -223,14 +223,14 @@ feature -- Filters
 		end
 
 	test_vignette
-			-- The centre keeps its brightness; a corner keeps about 1 - strength of it.
+			-- The center keeps its brightness; a corner keeps about 1 - strength of it.
 		local
 			l_image: IMG_IMAGE
 			l_corner: INTEGER
 		do
 			create l_image.make_filled (41, 41, 0xFFC8C8C8)
 			l_image.vignette (0.5)
-			assert ("centre kept", l_image.pixel (20, 20) = 0xFFC8C8C8)
+			assert ("center kept", l_image.pixel (20, 20) = 0xFFC8C8C8)
 			l_corner := channel (l_image.pixel (0, 0), 16)
 			assert ("corner darkened: " + l_corner.out, l_corner > 100 and l_corner < 110)
 			assert ("alpha untouched", channel (l_image.pixel (0, 0), 24) = 255)
@@ -370,7 +370,7 @@ feature -- Canvas
 		end
 
 	test_canvas_fill_through
-			-- A colour painted through a mask lands only where the mask is.
+			-- A color painted through a mask lands only where the mask is.
 		local
 			l_white: IMG_IMAGE
 			l_mask: IMG_MASK
@@ -421,8 +421,8 @@ feature -- Canvas
 			l_result := l_canvas.to_image
 			l_canvas.destroy
 
-			l_white := count_colour (l_result, 0xFFFFFFFF)
-			l_black := count_colour (l_result, 0xFF000000)
+			l_white := count_color (l_result, 0xFFFFFFFF)
+			l_black := count_color (l_result, 0xFF000000)
 			assert ("white fill: " + l_white.out, l_white > 2000)
 			assert ("black outline: " + l_black.out, l_black > 1000)
 			assert ("opaque", l_result.is_opaque)
@@ -524,10 +524,10 @@ feature -- Files and memory
 
 feature {NONE} -- Helpers
 
-	channel (a_colour: NATURAL_32; a_shift: INTEGER): INTEGER
-			-- The 8-bit channel of `a_colour' at `a_shift'.
+	channel (a_color: NATURAL_32; a_shift: INTEGER): INTEGER
+			-- The 8-bit channel of `a_color' at `a_shift'.
 		do
-			Result := ((a_colour |>> a_shift) & 0xFF).to_integer_32
+			Result := ((a_color |>> a_shift) & 0xFF).to_integer_32
 		end
 
 	byte_of (a_image: IMG_IMAGE; a_x, a_y, a_c: INTEGER): INTEGER
@@ -544,14 +544,14 @@ feature {NONE} -- Helpers
 			end
 		end
 
-	fill_rect (a_image: IMG_IMAGE; a_x, a_y, a_width, a_height: INTEGER; a_colour: NATURAL_32)
+	fill_rect (a_image: IMG_IMAGE; a_x, a_y, a_width, a_height: INTEGER; a_color: NATURAL_32)
 			-- Set a rectangle of pixels.
 		local
 			x, y: INTEGER
 		do
 			from y := a_y until y >= a_y + a_height loop
 				from x := a_x until x >= a_x + a_width loop
-					a_image.set_pixel (x, y, a_colour)
+					a_image.set_pixel (x, y, a_color)
 					x := x + 1
 				end
 				y := y + 1
@@ -586,14 +586,14 @@ feature {NONE} -- Helpers
 			end
 		end
 
-	count_colour (a_image: IMG_IMAGE; a_colour: NATURAL_32): INTEGER
-			-- Pixels exactly `a_colour'.
+	count_color (a_image: IMG_IMAGE; a_color: NATURAL_32): INTEGER
+			-- Pixels exactly `a_color'.
 		local
 			x, y: INTEGER
 		do
 			from y := 0 until y >= a_image.height loop
 				from x := 0 until x >= a_image.width loop
-					if a_image.pixel (x, y) = a_colour then
+					if a_image.pixel (x, y) = a_color then
 						Result := Result + 1
 					end
 					x := x + 1

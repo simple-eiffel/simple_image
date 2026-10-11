@@ -10,10 +10,10 @@ Image editing in Eiffel: load, filter, mask, compose, save. Built to make video 
 reel covers without Python.
 
 - **IMG_IMAGE**: straight (non-premultiplied) RGBA, 8 bits per channel, in C memory.
-  Blur, Lanczos-3 resize, crop, brightness, contrast, colour, vignette, flatten, alpha.
+  Blur, Lanczos-3 resize, crop, brightness, contrast, color, vignette, flatten, alpha.
 - **IMG_MASK**: one 8-bit channel. Blur, grow, shrink, threshold, invert, flood fill,
   keep the largest piece, resize, crop.
-- **IMG_CANVAS**: drawing on simple_cairo: place layers, paint a colour through a mask
+- **IMG_CANVAS**: drawing on simple_cairo: place layers, paint a color through a mask
   (glows, halos, shadows), and text and shapes through `context` (outlined text with
   `text_path`). A mask canvas turns whatever is drawn into a mask.
 - **SIMPLE_IMAGE**: facade: `load`, `load_mask`, `new_image`, `new_mask`, `new_canvas`,
@@ -53,13 +53,13 @@ The design came from an `/eiffel.debate` cycle, recorded in `.eiffel-workflow/de
 
 | Decision | Evidence |
 |---|---|
-| Pixels stay straight RGBA in C memory, not in a cairo surface | Premultiplied 8-bit storage loses a mean of 30 levels of colour at alpha 1-10 |
+| Pixels stay straight RGBA in C memory, not in a cairo surface | Premultiplied 8-bit storage loses a mean of 30 levels of color at alpha 1-10 |
 | Every kernel that mixes soft-alpha pixels premultiplies in float inside the loop | A straight blur turns a red edge dark (R 90 instead of 255) |
-| Glows and shadows are a mask plus a colour fill | Within 0.2 levels of a float premultiplied blur |
+| Glows and shadows are a mask plus a color fill | Within 0.2 levels of a float premultiplied blur |
 | Per-pixel loops in C, contracts on the Eiffel features | Eiffel loops with contracts on ran 3.6-4.4 times slower |
 | Our own Lanczos-3, not cairo's scaler | cairo's best filter is off by up to 61 levels on mask edges; ours by 4 against PIL |
 
-Colours are `NATURAL_32` words `0xAARRGGBB` with straight alpha. Paths must be plain ASCII
+Colors are `NATURAL_32` words `0xAARRGGBB` with straight alpha. Paths must be plain ASCII
 (simple_stb opens files with `fopen`).
 
 ## Tests
@@ -70,7 +70,7 @@ PATH="/d/prod/simple_cairo:$PATH" ./EIFGENs/simple_image_tests/F_code/simple_ima
 ```
 
 27 tests. They write to `data/output/`. The soft-edge tests were checked by breaking the kernel
-rule on purpose: a straight-colour blur and resize fail them.
+rule on purpose: a straight-color blur and resize fail them.
 
 ## Dependencies
 

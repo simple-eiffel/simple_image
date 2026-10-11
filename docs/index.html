@@ -171,7 +171,7 @@
                 <h4>Initialization</h4>
                 <div class="signature">make (a_width, a_height: INTEGER)</div>
                 <p>Transparent black image.</p>
-                <div class="signature">make_filled (a_width, a_height: INTEGER; a_colour: NATURAL_32)</div>
+                <div class="signature">make_filled (a_width, a_height: INTEGER; a_color: NATURAL_32)</div>
                 <p>Image filled with a color (0xAARRGGBB).</p>
                 <h4>Access</h4>
                 <div class="signature">width: INTEGER</div>
@@ -191,9 +191,9 @@
                 <div class="signature">is_inside (a_x, a_y, a_width, a_height: INTEGER): BOOLEAN</div>
                 <p>Does the rectangle lie wholly inside the image?</p>
                 <h4>Pixels</h4>
-                <div class="signature">set_pixel (a_x, a_y: INTEGER; a_colour: NATURAL_32)</div>
+                <div class="signature">set_pixel (a_x, a_y: INTEGER; a_color: NATURAL_32)</div>
                 <p>Set the color at the position.</p>
-                <div class="signature">fill (a_colour: NATURAL_32)</div>
+                <div class="signature">fill (a_color: NATURAL_32)</div>
                 <p>Set every pixel to the color.</p>
                 <div class="signature">set_alpha (a_mask: IMG_MASK)</div>
                 <p>Use the mask as the alpha channel. Color under alpha 0 is kept.</p>
@@ -314,9 +314,9 @@
                 <p>Paint the image over the canvas with its top-left corner at the position.</p>
                 <div class="signature">place_sized (a_image: IMG_IMAGE; a_x, a_y: REAL_64; a_width, a_height: INTEGER)</div>
                 <p>Paint the image scaled (Lanczos-3) at the position.</p>
-                <div class="signature">fill_through (a_mask: IMG_MASK; a_colour: NATURAL_32; a_x, a_y: REAL_64)</div>
+                <div class="signature">fill_through (a_mask: IMG_MASK; a_color: NATURAL_32; a_x, a_y: REAL_64)</div>
                 <p>Paint a color through the mask: halos, shadows, glows and text shadows.</p>
-                <div class="signature">fill (a_colour: NATURAL_32)</div>
+                <div class="signature">fill (a_color: NATURAL_32)</div>
                 <p>Paint the whole canvas with the color over what is there.</p>
                 <h4>Results and removal</h4>
                 <div class="signature">to_image: IMG_IMAGE</div>
