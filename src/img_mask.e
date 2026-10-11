@@ -131,6 +131,23 @@ feature -- Access
 			in_range: Result >= 0 and Result <= pixel_count
 		end
 
+	bounds (a_level: INTEGER): TUPLE [x, y, width, height: INTEGER]
+			-- Smallest rectangle holding every value >= `a_level' (all 0 when there is none):
+			-- where the person is in a cutout mask.
+		require
+			usable: is_usable
+			level_in_range: a_level >= 1 and a_level <= 255
+		local
+			l_out: MANAGED_POINTER
+		do
+			create l_out.make (16)
+			c_bounds (values, width, height, a_level, l_out.item)
+			Result := [l_out.read_integer_32 (0), l_out.read_integer_32 (4), l_out.read_integer_32 (8), l_out.read_integer_32 (12)]
+		ensure
+			empty_or_inside: Result.width = 0 or else is_inside (Result.x, Result.y, Result.width, Result.height)
+			empty_when_none: (Result.width = 0) = (count_at_least (a_level) = 0)
+		end
+
 	last_piece_size: INTEGER
 			-- Size of the piece kept by the last `keep_largest_piece' (0 when there was none).
 
@@ -293,7 +310,6 @@ feature -- Files
 		require
 			usable: is_usable
 			path_not_empty: not a_path.is_empty
-			narrow_path: a_path.is_valid_as_string_8
 		do
 			Result := stb.write_png (a_path)
 		end

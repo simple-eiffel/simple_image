@@ -155,6 +155,11 @@ feature {NONE} -- Kernels: masks
 		alias "return img_keep_largest ((unsigned char *) $a_p, (int) $a_w, (int) $a_h, (int) $a_level);"
 		end
 
+	c_bounds (a_p: POINTER; a_w, a_h, a_level: INTEGER; a_out: POINTER)
+		external "C inline use %"simple_image.h%""
+		alias "img_bounds ((const unsigned char *) $a_p, (int) $a_w, (int) $a_h, (int) $a_level, (int *) $a_out);"
+		end
+
 	c_floats_to_mask (a_f: POINTER; a_n: INTEGER; a_m: POINTER)
 		external "C inline use %"simple_image.h%""
 		alias "img_floats_to_mask ((const float *) $a_f, (size_t) $a_n, (unsigned char *) $a_m);"

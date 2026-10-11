@@ -489,6 +489,39 @@ feature -- Files and memory
 			end
 		end
 
+	test_mask_bounds
+			-- The bounding box of the values at or above a level; all 0 for an empty mask.
+		local
+			l_mask: IMG_MASK
+			l_box: TUPLE [x, y, width, height: INTEGER]
+		do
+			create l_mask.make (50, 40)
+			assert ("empty", l_mask.bounds (128).width = 0)
+			fill_mask_rect (l_mask, 12, 7, 20, 9, 255)
+			l_mask.set_value (40, 30, 90)
+			l_box := l_mask.bounds (128)
+			assert ("box: " + l_box.x.out + "," + l_box.y.out + " " + l_box.width.out + "x" + l_box.height.out,
+				l_box.x = 12 and l_box.y = 7 and l_box.width = 20 and l_box.height = 9)
+			assert ("lower level reaches the soft pixel", l_mask.bounds (50).width = 29)
+		end
+
+	test_unicode_path_round_trip
+			-- A title with an en dash and curly quotes in the file name saves and loads.
+		local
+			l_image: IMG_IMAGE
+			l_path: STRING_32
+		do
+			l_image := noise_image (12, 8, True)
+			l_path := {STRING_32} "data/output/title %/8211/ %/8220/quoted%/8221/.png"
+			output_path ("x").do_nothing
+			assert ("written", l_image.save_png (l_path))
+			if attached (create {SIMPLE_IMAGE}.make).load (l_path) as al_back then
+				assert ("same pixels", al_back.is_equal (l_image))
+			else
+				assert ("loaded", False)
+			end
+		end
+
 	test_load_failure_reports
 			-- A missing file gives Void and a reason.
 		local

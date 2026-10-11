@@ -59,8 +59,8 @@ The design came from an `/eiffel.debate` cycle, recorded in `.eiffel-workflow/de
 | Per-pixel loops in C, contracts on the Eiffel features | Eiffel loops with contracts on ran 3.6-4.4 times slower |
 | Our own Lanczos-3, not cairo's scaler | cairo's best filter is off by up to 61 levels on mask edges; ours by 4 against PIL |
 
-Colors are `NATURAL_32` words `0xAARRGGBB` with straight alpha. Paths must be plain ASCII
-(simple_stb opens files with `fopen`).
+Colors are `NATURAL_32` words `0xAARRGGBB` with straight alpha. File names may hold any
+Unicode character (simple_stb 1.2.0 opens them as UTF-8).
 
 ## Tests
 
@@ -74,5 +74,5 @@ rule on purpose: a straight-color blur and resize fail them.
 
 ## Dependencies
 
-simple_stb (1.1.0 or later: images free themselves; the stb implementation is static so
-clients link), simple_cairo (1.4.0 or later: `text_path`), EiffelBase.
+simple_stb (1.2.0 or later: images free themselves, the stb implementation is static so
+clients link, Unicode file names), simple_cairo (1.4.0 or later: `text_path`), EiffelBase.

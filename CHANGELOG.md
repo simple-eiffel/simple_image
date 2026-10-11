@@ -2,6 +2,17 @@
 
 All notable changes to simple_image will be documented in this file.
 
+## [0.2.0] - 2026-10-11
+
+### Added
+- IMG_MASK.bounds (level): the smallest rectangle holding the values at or above a level
+  (where the person is in a cutout), from a C kernel.
+
+### Changed
+- File names may hold any Unicode character (needs simple_stb 1.2.0); the ASCII-only
+  preconditions are gone. Tests: bounds, and a PNG round trip through a name with an
+  en dash and curly quotes. 29 tests.
+
 ## [0.1.0] - 2026-10-11
 
 ### Added

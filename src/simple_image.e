@@ -46,7 +46,6 @@ feature -- Loading
 			-- The image in the file `a_path' as RGBA, or Void (see `last_error').
 		require
 			path_not_empty: not a_path.is_empty
-			narrow_path: a_path.is_valid_as_string_8
 		local
 			l_stb: STB_IMAGE
 		do
@@ -55,7 +54,7 @@ feature -- Loading
 				create Result.make_from_stb (l_stb)
 				last_error := ""
 			else
-				last_error := "cannot load " + a_path.to_string_8 + ": " + l_stb.error_message
+				last_error := "cannot load " + (create {UTF_CONVERTER}).string_32_to_utf_8_string_8 (a_path.to_string_32) + ": " + l_stb.error_message
 				l_stb.destroy
 			end
 		ensure
@@ -67,7 +66,6 @@ feature -- Loading
 			-- The file `a_path' read as one gray channel, or Void (see `last_error').
 		require
 			path_not_empty: not a_path.is_empty
-			narrow_path: a_path.is_valid_as_string_8
 		do
 			if attached load (a_path) as al_image then
 				Result := gray_of (al_image)
@@ -150,7 +148,7 @@ feature -- Status
 			Result := not last_error.is_empty
 		end
 
-	version: STRING = "0.1.0"
+	version: STRING = "0.2.0"
 			-- Library version.
 
 feature {NONE} -- Implementation

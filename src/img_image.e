@@ -302,7 +302,6 @@ feature -- Files
 		require
 			usable: is_usable
 			path_not_empty: not a_path.is_empty
-			narrow_path: a_path.is_valid_as_string_8
 		do
 			Result := stb.write_png (a_path)
 		end
@@ -313,7 +312,6 @@ feature -- Files
 			usable: is_usable
 			opaque: is_opaque
 			path_not_empty: not a_path.is_empty
-			narrow_path: a_path.is_valid_as_string_8
 			quality_in_range: a_quality >= 1 and a_quality <= 100
 		do
 			Result := stb.write_jpg (a_path, a_quality)

@@ -462,6 +462,21 @@ static int img_keep_largest (unsigned char *p, int w, int h, int level) {
 	return best_size;
 }
 
+/* Smallest rectangle holding every value >= level: out = x, y, width, height (all 0 when none). */
+static void img_bounds (const unsigned char *p, int w, int h, int level, int *out) {
+	int x, y, x0 = w, y0 = h, x1 = -1, y1 = -1;
+	for (y = 0; y < h; y++) for (x = 0; x < w; x++) {
+		if (p[(size_t) y * w + x] >= level) {
+			if (x < x0) x0 = x;
+			if (x > x1) x1 = x;
+			if (y < y0) y0 = y;
+			if (y > y1) y1 = y;
+		}
+	}
+	if (x1 < 0) { out[0] = 0; out[1] = 0; out[2] = 0; out[3] = 0; }
+	else { out[0] = x0; out[1] = y0; out[2] = x1 - x0 + 1; out[3] = y1 - y0 + 1; }
+}
+
 /* Min-max normalize n floats into bytes (rembg's way: (v - min) / (max - min)). */
 static void img_floats_to_mask (const float *f, size_t n, unsigned char *m) {
 	size_t i;
