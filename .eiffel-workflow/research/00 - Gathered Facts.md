@@ -36,7 +36,7 @@ Video frames come from ffmpeg (PNG), which Eiffel already drives (simple_process
 
 ## The AI helper's recipe (rembg u2net_human_seg, read raw from rembg's installed source)
 
-- Model file: `C:\Users\LJR19\.rembg\models\u2net_human_seg\u2net_human_seg.onnx` (175,997,641 bytes).
+- Model file: `C:\Users\user\.rembg\models\u2net_human_seg\u2net_human_seg.onnx` (175,997,641 bytes).
 - Input `input.1`: float32 `[1, 3, 320, 320]`. Preprocess: RGB, resize to 320x320 (Lanczos), divide by the
   image's max value, per channel `(x - mean) / std` with mean (0.485, 0.456, 0.406), std (0.229, 0.224, 0.225), HWC to CHW.
 - Outputs: 7 tensors, each float32 `[1, 1, 320, 320]`; rembg uses the first (`1959`).

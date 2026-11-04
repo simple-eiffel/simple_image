@@ -1,6 +1,6 @@
 # 04 - Where the pixels live: Fork Register
 
-*2026-10-11. Code-lite cycle (5 agents). ROE: General Research ROE v1.0; seats read `C:\Users\LJR19\.claude\skills\eiffel-debate\ROE-CARD.md` (v1.0, gated).*
+*2026-10-11. Code-lite cycle (5 agents). ROE: General Research ROE v1.0; seats read `C:\Users\user\.claude\skills\eiffel-debate\ROE-CARD.md` (v1.0, gated).*
 
 ## Context (read these by path; do not re-derive)
 - Goal and requirements: `D:\prod\simple_image\.eiffel-workflow\research\00 - Gathered Facts.md`

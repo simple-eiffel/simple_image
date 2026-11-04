@@ -7,7 +7,7 @@ import sys, os, time
 import numpy as np
 from PIL import Image
 
-MODEL = r"C:\Users\LJR19\.rembg\models\u2net_human_seg\u2net_human_seg.onnx"
+MODEL = os.path.expanduser(r"~\.rembg\models\u2net_human_seg\u2net_human_seg.onnx")
 mode, work = sys.argv[1], sys.argv[2]
 os.makedirs(work, exist_ok=True)
 
