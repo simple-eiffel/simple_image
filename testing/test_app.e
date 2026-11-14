@@ -25,6 +25,10 @@ feature {NONE} -- Initialization
 			run_test (agent l_tests.test_twin_is_independent, "test_twin_is_independent")
 			run_test (agent l_tests.test_cropped, "test_cropped")
 			run_test (agent l_tests.test_set_alpha_keeps_color, "test_set_alpha_keeps_color")
+			run_test (agent l_tests.test_grayscale_is_rec_709_luma, "test_grayscale_is_rec_709_luma")
+			run_test (agent l_tests.test_rounded_cuts_the_corners, "test_rounded_cuts_the_corners")
+			run_test (agent l_tests.test_rounded_scales_a_soft_alpha, "test_rounded_scales_a_soft_alpha")
+			run_test (agent l_tests.test_circled_keeps_the_centered_circle, "test_circled_keeps_the_centered_circle")
 			run_test (agent l_tests.test_flatten_onto, "test_flatten_onto")
 
 			io.put_string ("Filters:%N")

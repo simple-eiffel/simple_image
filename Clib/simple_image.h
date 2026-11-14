@@ -285,6 +285,54 @@ static void img_vignette (unsigned char *p, int w, int h, double strength) {
 	}
 }
 
+/* 1z-a: grayscale by Rec. 709 luma, in integers so every platform gives the same bytes; alpha kept. */
+static void img_grayscale (unsigned char *p, size_t n) {
+    for (size_t i = 0; i < n; i++, p += 4) {
+        unsigned int y = (2126u * p[0] + 7152u * p[1] + 722u * p[2] + 5000u) / 10000u;
+        p[0] = p[1] = p[2] = (unsigned char) y;
+    }
+}
+
+/* 1z-a: the shapes `rounded' and `circled' keep, measured in sixteenths of a pixel so that every
+   test is integer arithmetic (identical bytes on every platform). Mode 1: the image's rectangle
+   with corners of radius `r16' (the point is clamped to the inner rectangle, then its distance
+   to that clamped point must be at most the radius). Mode 2: the largest centered circle. */
+static int img_shape_has (int mode, long long sx, long long sy, long long w16, long long h16, long long r16) {
+    long long cx, cy, dx, dy;
+    if (mode == 1) {
+        cx = sx < r16 ? r16 : (sx > w16 - r16 ? w16 - r16 : sx);
+        cy = sy < r16 ? r16 : (sy > h16 - r16 ? h16 - r16 : sy);
+    } else {
+        cx = w16 / 2; cy = h16 / 2;
+    }
+    dx = sx - cx; dy = sy - cy;
+    return dx * dx + dy * dy <= r16 * r16;
+}
+
+/* Scale each pixel's alpha by how much of it the shape covers: 64 sample points, an 8 by 8 grid
+   at the centers of its sixty-fourths, rounded to the nearest. Both shapes are convex, so a pixel
+   whose four corners are inside is wholly inside and kept as it is. Colors are kept (straight
+   alpha). Mode 1 takes the corner radius `r' in pixels (at most half the shorter side). */
+static void img_shape_alpha (unsigned char *p, int w, int h, int mode, int r) {
+    long long w16 = 16LL * w, h16 = 16LL * h;
+    long long r16 = mode == 1 ? 16LL * r : 8LL * (w < h ? w : h);
+    if (mode == 1 && r16 * 2 > (w16 < h16 ? w16 : h16)) r16 = (w16 < h16 ? w16 : h16) / 2;
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            long long x0 = 16LL * x, y0 = 16LL * y;
+            if (img_shape_has (mode, x0, y0, w16, h16, r16) && img_shape_has (mode, x0 + 16, y0, w16, h16, r16)
+                && img_shape_has (mode, x0, y0 + 16, w16, h16, r16) && img_shape_has (mode, x0 + 16, y0 + 16, w16, h16, r16))
+                continue;
+            int l_in = 0;
+            for (int j = 0; j < 8; j++)
+                for (int i = 0; i < 8; i++)
+                    l_in += img_shape_has (mode, x0 + 2 * i + 1, y0 + 2 * j + 1, w16, h16, r16);
+            unsigned char *q = p + ((size_t) y * w + x) * 4;
+            q[3] = (unsigned char) (((unsigned int) q[3] * (unsigned int) l_in + 32u) / 64u);
+        }
+    }
+}
+
 static void img_flatten (unsigned char *p, size_t n, int br, int bg, int bb) {
 	size_t i;
 	for (i = 0; i < n; i++) {

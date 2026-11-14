@@ -56,6 +56,16 @@ feature {NONE} -- Kernels: blur, grow, resize
 
 feature {NONE} -- Kernels: point operations
 
+	c_grayscale (a_p: POINTER; a_n: INTEGER)
+		external "C inline use %"simple_image.h%""
+		alias "img_grayscale ((unsigned char *) $a_p, (size_t) $a_n);"
+		end
+
+	c_shape_alpha (a_p: POINTER; a_w, a_h, a_mode, a_r: INTEGER)
+		external "C inline use %"simple_image.h%""
+		alias "img_shape_alpha ((unsigned char *) $a_p, (int) $a_w, (int) $a_h, (int) $a_mode, (int) $a_r);"
+		end
+
 	c_mean_gray (a_p: POINTER; a_n: INTEGER): REAL_64
 		external "C inline use %"simple_image.h%""
 		alias "return img_mean_gray ((const unsigned char *) $a_p, (size_t) $a_n);"
