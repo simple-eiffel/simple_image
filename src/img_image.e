@@ -295,6 +295,49 @@ feature -- New images
 			sized: Result.width = a_width and Result.height = a_height
 		end
 
+	grayscale: IMG_IMAGE
+			-- A new image in shades of gray: each pixel's Rec. 709 luma (2126 R + 7152 G + 722 B,
+			-- out of 10000, rounded), its alpha kept. Integer arithmetic: the same bytes on every
+			-- platform.
+		require
+			usable: is_usable
+		do
+			Result := twin
+			c_grayscale (Result.pixels, Result.pixel_count)
+		ensure
+			sized: Result.width = width and Result.height = height
+			alpha_kept: (Result.pixel (0, 0) |>> 24) = (pixel (0, 0) |>> 24)
+		end
+
+	rounded (a_radius: INTEGER): IMG_IMAGE
+			-- A new image with its corners cut round to `a_radius' (at most half the shorter
+			-- side): pixels outside become transparent, and edge pixels keep the share of their
+			-- alpha the shape covers (64 samples each). Colors are kept.
+		require
+			usable: is_usable
+			radius_not_negative: a_radius >= 0
+		do
+			Result := twin
+			if a_radius > 0 then
+				c_shape_alpha (Result.pixels, width, height, 1, a_radius)
+			end
+		ensure
+			sized: Result.width = width and Result.height = height
+		end
+
+	circled: IMG_IMAGE
+			-- A new image keeping only the largest centered circle (an avatar): pixels outside
+			-- become transparent, and edge pixels keep the share of their alpha the circle
+			-- covers (64 samples each). Colors are kept.
+		require
+			usable: is_usable
+		do
+			Result := twin
+			c_shape_alpha (Result.pixels, width, height, 2, 0)
+		ensure
+			sized: Result.width = width and Result.height = height
+		end
+
 feature -- Files
 
 	save_png (a_path: READABLE_STRING_GENERAL): BOOLEAN

@@ -760,4 +760,81 @@ feature {NONE} -- Helpers
 			"struct timespec t; timespec_get (&t, TIME_UTC); return (EIF_REAL_64) t.tv_sec * 1000.0 + (EIF_REAL_64) t.tv_nsec / 1000000.0;"
 		end
 
+
+feature -- 1z-a effects (exact pixels: the same bytes on every platform)
+
+	test_grayscale_is_rec_709_luma
+			-- Each color becomes its Rec. 709 luma, rounded, with its alpha kept.
+		local
+			l_image, l_gray: IMG_IMAGE
+		do
+			create l_image.make (5, 1)
+			l_image.set_pixel (0, 0, 0x80FF0000)   -- red, alpha 128
+			l_image.set_pixel (1, 0, 0xFF00FF00)   -- green
+			l_image.set_pixel (2, 0, 0xFF0000FF)   -- blue
+			l_image.set_pixel (3, 0, 0xFFFFFFFF)   -- white
+			l_image.set_pixel (4, 0, 0x400A141E)   -- (10, 20, 30), alpha 64
+			l_gray := l_image.grayscale
+			assert ("red: 54, alpha kept", l_gray.pixel (0, 0) = 0x80363636)
+			assert ("green: 182", l_gray.pixel (1, 0) = 0xFFB6B6B6)
+			assert ("blue: 18", l_gray.pixel (2, 0) = 0xFF121212)
+			assert ("white stays white", l_gray.pixel (3, 0) = 0xFFFFFFFF)
+			assert ("(10, 20, 30): 19, alpha kept", l_gray.pixel (4, 0) = 0x40131313)
+			assert ("the original is unchanged", l_image.pixel (0, 0) = 0x80FF0000)
+		end
+
+	test_rounded_cuts_the_corners
+			-- A 40 x 30 opaque white image, corners of radius 10: outside transparent, the edge
+			-- pixels' alpha the share of 64 samples inside, the rest and the colors unchanged.
+		local
+			l_image, l_round: IMG_IMAGE
+		do
+			create l_image.make_filled (40, 30, 0xFFFFFFFF)
+			l_round := l_image.rounded (10)
+			assert ("corner pixel gone", l_round.pixel (0, 0) = 0x00FFFFFF)
+			assert ("(1, 1) gone", l_round.pixel (1, 1) = 0x00FFFFFF)
+			assert ("(2, 2): 4 of 255", l_round.pixel (2, 2) = 0x04FFFFFF)
+			assert ("(1, 5): 231", l_round.pixel (1, 5) = 0xE7FFFFFF)
+			assert ("(3, 3) inside", l_round.pixel (3, 3) = 0xFFFFFFFF)
+			assert ("top edge past the corner", l_round.pixel (10, 0) = 0xFFFFFFFF)
+			assert ("left edge past the corner", l_round.pixel (0, 10) = 0xFFFFFFFF)
+			assert ("center", l_round.pixel (20, 15) = 0xFFFFFFFF)
+			assert ("opposite corner gone", l_round.pixel (39, 29) = 0x00FFFFFF)
+			assert ("radius 0 changes nothing", l_image.rounded (0).pixel (0, 0) = 0xFFFFFFFF)
+		end
+
+	test_rounded_scales_a_soft_alpha
+			-- An edge pixel's own alpha is scaled by the shape's share: at (2, 2) one sample of 64
+			-- is inside (255 gives 4 there), so 128 gives (128 x 1 + 32) // 64 = 2. The share is of
+			-- the pixel's alpha, not a new alpha.
+		local
+			l_image: IMG_IMAGE
+		do
+			create l_image.make_filled (40, 30, 0x80102030)
+			assert ("(2, 2): 128 scaled to 2", l_image.rounded (10).pixel (2, 2) = 0x02102030)
+			assert ("(1, 5): 128 x 58 / 64 = 116", l_image.rounded (10).pixel (1, 5) = 0x74102030)
+		end
+
+	test_circled_keeps_the_centered_circle
+			-- A 20 x 20 opaque image keeps the circle of diameter 20; a 30 x 20 one keeps a circle
+			-- of diameter 20 in its middle.
+		local
+			l_square, l_wide, l_circle: IMG_IMAGE
+		do
+			create l_square.make_filled (20, 20, 0xFF336699)
+			l_circle := l_square.circled
+			assert ("corner gone", l_circle.pixel (0, 0) = 0x00336699)
+			assert ("(2, 2): 4", l_circle.pixel (2, 2) = 0x04336699)
+			assert ("(2, 3): 151", l_circle.pixel (2, 3) = 0x97336699)
+			assert ("(3, 2): 151, the same by symmetry", l_circle.pixel (3, 2) = 0x97336699)
+			assert ("(1, 4): 84", l_circle.pixel (1, 4) = 0x54336699)
+			assert ("(17, 17): 4, the same by symmetry", l_circle.pixel (17, 17) = 0x04336699)
+			assert ("center", l_circle.pixel (10, 10) = 0xFF336699)
+			create l_wide.make_filled (30, 20, 0xFFFFFFFF)
+			l_circle := l_wide.circled
+			assert ("left of the circle gone", l_circle.pixel (0, 10) = 0x00FFFFFF)
+			assert ("right of the circle gone", l_circle.pixel (25, 10) = 0x00FFFFFF)
+			assert ("inside", l_circle.pixel (5, 10) = 0xFFFFFFFF and l_circle.pixel (24, 10) = 0xFFFFFFFF)
+		end
+
 end
