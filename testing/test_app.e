@@ -56,6 +56,8 @@ feature {NONE} -- Initialization
 
 			io.put_string ("Files and memory:%N")
 			run_test (agent l_tests.test_png_round_trip, "test_png_round_trip")
+			run_test (agent l_tests.test_png_bytes_round_trip, "test_png_bytes_round_trip")
+			run_test (agent l_tests.test_cairo_surface_copies_the_image, "test_cairo_surface_copies_the_image")
 			run_test (agent l_tests.test_mask_png_round_trip, "test_mask_png_round_trip")
 			run_test (agent l_tests.test_mask_bounds, "test_mask_bounds")
 			run_test (agent l_tests.test_unicode_path_round_trip, "test_unicode_path_round_trip")

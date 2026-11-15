@@ -473,6 +473,42 @@ feature -- Files and memory
 			end
 		end
 
+	test_png_bytes_round_trip
+			-- 1z-a: an image with soft alpha survives PNG bytes in memory exactly.
+		local
+			l_image: IMG_IMAGE
+			l_bytes: MANAGED_POINTER
+		do
+			l_image := noise_image (33, 21, True)
+			l_bytes := l_image.png_bytes
+			assert ("PNG signature", l_bytes.read_natural_8 (0) = 0x89 and l_bytes.read_natural_8 (1) = 0x50)
+			if attached (create {SIMPLE_STB}.make).load_rgba_from_memory (l_bytes) as al_stb and then al_stb.is_valid then
+				assert ("same size", al_stb.width = 33 and al_stb.height = 21)
+				assert ("same corner", al_stb.pixel (0, 0).a.to_natural_32 = (l_image.pixel (0, 0) |>> 24))
+			else
+				assert ("decoded", False)
+			end
+		end
+
+	test_cairo_surface_copies_the_image
+			-- 1z-a: the cairo copy holds the pixels premultiplied, and comes back exactly when opaque.
+		local
+			l_image: IMG_IMAGE
+			l_surface: CAIRO_SURFACE
+			l_back: IMG_IMAGE
+			l_canvas: IMG_CANVAS
+		do
+			l_image := noise_image (40, 30, False)
+			l_surface := l_image.to_cairo_surface
+			assert ("sized", l_surface.width = 40 and l_surface.height = 30)
+			create l_canvas.make (40, 30)
+			l_canvas.context.set_source_surface (l_surface, 0.0, 0.0).paint.do_nothing
+			l_back := l_canvas.to_image
+			assert ("exact when opaque", l_back.is_equal (l_image))
+			l_canvas.destroy
+			l_surface.destroy
+		end
+
 	test_mask_png_round_trip
 			-- A mask saved as gray PNG loads back as the same mask.
 		local
