@@ -338,6 +338,33 @@ feature -- New images
 			sized: Result.width = width and Result.height = height
 		end
 
+feature -- Conversion
+
+	to_cairo_surface: CAIRO_SURFACE
+			-- A new cairo image surface (ARGB32, premultiplied) holding a copy of the pixels, for
+			-- drawing the image scaled or clipped (simple_gui's image view). The caller destroys it.
+		require
+			usable: is_usable
+		do
+			create Result.make_with_format ({SIMPLE_CAIRO}.Format_argb32, width, height)
+			ensure_memory (Result.is_valid)
+			Result.flush.do_nothing
+			c_to_cairo (pixels, width, height, Result.data, Result.stride)
+			Result.mark_dirty.do_nothing
+		ensure
+			sized: Result.width = width and Result.height = height
+		end
+
+	png_bytes: MANAGED_POINTER
+			-- The image as a PNG file's bytes, in memory (alpha kept): what `save_png' would write.
+		require
+			usable: is_usable
+		do
+			Result := stb.png_bytes
+		ensure
+			encoded: Result.count > 8
+		end
+
 feature -- Files
 
 	save_png (a_path: READABLE_STRING_GENERAL): BOOLEAN
